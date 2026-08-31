@@ -120,7 +120,7 @@ package body Swap_Test is
       Ada.Numerics.Float_Random.Reset (Gen);
 
       for I in 1 .. Shots loop
-         if Ada.Numerics.Float_Random.Random (Gen) < Real (P0) then
+         if Real (Ada.Numerics.Float_Random.Random (Gen)) < Real (P0) then
             Zero_Count := Zero_Count + 1;
          end if;
       end loop;
