@@ -17,21 +17,21 @@ procedure Tests is
    end Check;
 
    -- Helper sample states
-   State_Zero : constant State_Array := (
+   State_Zero : constant State_Array := [
       (Re => 1.0, Im => 0.0),
       (Re => 0.0, Im => 0.0)
-   );
+   ];
 
-   State_One : constant State_Array := (
+   State_One : constant State_Array := [
       (Re => 0.0, Im => 0.0),
       (Re => 1.0, Im => 0.0)
-   );
+   ];
 
    Inv_Sqrt2 : constant Real := 0.7071067811865475244;
-   State_Plus : constant State_Array := (
+   State_Plus : constant State_Array := [
       (Re => Inv_Sqrt2, Im => 0.0),
       (Re => Inv_Sqrt2, Im => 0.0)
-   );
+   ];
 
    function Get_Test_State (Index : Positive) return State_Array is
    begin
@@ -69,12 +69,12 @@ begin
    Put_Line ("TEST 4 — State Normalization Validation");
    Check ("4.1 State_Zero is normalized", Is_Normalized (State_Zero));
    Check ("4.2 State_Plus is normalized", Is_Normalized (State_Plus));
-   Check ("4.3 Unnormalized state is rejected", not Is_Normalized (((Re => 2.0, Im => 0.0), (Re => 0.0, Im => 0.0))));
+   Check ("4.3 Unnormalized state is rejected", not Is_Normalized ([(Re => 2.0, Im => 0.0), (Re => 0.0, Im => 0.0)]));
 
    -- TEST 5 — State Normalization Builder
    Put_Line ("TEST 5 — State Normalization Builder");
    declare
-      Unnorm : constant State_Array := ((Re => 3.0, Im => 0.0), (Re => 4.0, Im => 0.0));
+      Unnorm : constant State_Array := [(Re => 3.0, Im => 0.0), (Re => 4.0, Im => 0.0)];
       Normed : constant State_Array := Normalized_State (Unnorm);
    begin
       Check ("5.1 Normalized state length preserved", Normed'Length = 2);
@@ -148,7 +148,7 @@ begin
       pragma Unreferenced (Dummy);
    begin
       begin
-         Dummy := Exact_Squared_Overlap (State_Zero, ((Re => 1.0, Im => 0.0), (Re => 0.0, Im => 0.0), (Re => 0.0, Im => 0.0)));
+         Dummy := Exact_Squared_Overlap (State_Zero, [(Re => 1.0, Im => 0.0), (Re => 0.0, Im => 0.0), (Re => 0.0, Im => 0.0)]);
       exception
          when Dimension_Mismatch_Exception =>
             Caught := True;
@@ -162,15 +162,20 @@ begin
    Put_Line ("TEST 14 — Exception Handling: Invalid State");
    declare
       Caught : Boolean := False;
-      Bad_Norm : State_Array (1 .. 0);
-      Dummy_State : State_Array;
-      pragma Unreferenced (Bad_Norm, Dummy_State);
+      Bad_Norm : constant State_Array := [];
    begin
       begin
-         Dummy_State := Normalized_State (Bad_Norm);
+         declare
+            Dummy_State : constant State_Array := Normalized_State (Bad_Norm);
+            pragma Unreferenced (Dummy_State);
+         begin
+            null;
+         end;
       exception
          when Invalid_State_Exception =>
             Caught := True;
+         when others =>
+            null;
       end;
       Check ("14.1 Zero-length state raises Invalid_State_Exception", Caught);
       Check ("14.2 Exception safety verified", True);
